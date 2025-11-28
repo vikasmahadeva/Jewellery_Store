@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}My Profile{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">👤 My Profile</h2>
+
+<div class="row">
+  <!-- User Info Card -->
+  <div class="col-md-4">
+    <div class="card shadow-sm mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Account Info</h5>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
+      </div>
+    </div>
+
+    <!-- Update Info Form -->
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">✏️ Edit Profile</h5>
+        <form method="post">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          
+          <div class="mb-3">
+            <label for="username" class="form-label">New Username</label>
+            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">New Email</label>
+            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100">Update Profile</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Orders History -->
+  <div class="col-md-8">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">📦 My Orders</h5>
+
+        {% if orders %}
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Total Amount</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                <tr>
+                  <td>{{ order.id }}</td>
+                  <td>₹ {{ '%.2f'|format(order.total_amount) }}</td>
+                  <td>
+                    {% if order.status == 'DELIVERED' %}
+                      <span class="badge bg-success">{{ order.status }}</span>
+                    {% elif order.status == 'CANCELLED' %}
+                      <span class="badge bg-danger">{{ order.status }}</span>
+                    {% else %}
+                      <span class="badge bg-info text-dark">{{ order.status }}</span>
+                    {% endif %}
+                  </td>
+                  <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                  <td>
+                    <a href="{{ url_for('product.my_order_detail', order_id=order.id) }}" class="btn btn-sm btn-primary">View Details</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <div class="alert alert-info">You have not placed any orders yet.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

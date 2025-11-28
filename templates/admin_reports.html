@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block title %}Admin Reports{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="mb-4 text-center">📊 Admin Reports</h2>
+
+  <!-- Summary Cards -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Total Products</h6>
+          <h3>{{ total_products }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Total Users</h6>
+          <h3>{{ total_users }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Total Orders</h6>
+          <h3>{{ total_orders }}</h3>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Total Revenue</h6>
+          <h3>₹ {{ "%.2f"|format(total_revenue) }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Charts Section -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">📈 Sales Trend</h5>
+          <canvas id="salesChart"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">📦 Category Distribution</h5>
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top Selling Products -->
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <h5 class="card-title">🏆 Top Selling Products</h5>
+      {% if top_products %}
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Quantity Sold</th>
+              <th>Total Revenue</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for product in top_products %}
+              <tr>
+                <td>{{ product.name }}</td>
+                <td>{{ product.quantity }}</td>
+                <td>₹ {{ "%.2f"|format(product.revenue) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="alert alert-info">No sales data yet.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Recent Orders -->
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title">🛒 Recent Orders</h5>
+      {% if recent_orders %}
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Total Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for order in recent_orders %}
+              <tr>
+                <td>#{{ order.id }}</td>
+                <td>{{ order.user.email }}</td>
+                <td>
+                  <span class="badge {% if order.status == 'DELIVERED' %}bg-success{% elif order.status == 'PENDING' %}bg-warning{% else %}bg-secondary{% endif %}">
+                    {{ order.status }}
+                  </span>
+                </td>
+                <td>₹ {{ "%.2f"|format(order.total_amount) }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <div class="alert alert-info">No recent orders.</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- Add Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Sales Trend (Dummy Data, replace with backend values)
+  const salesCtx = document.getElementById('salesChart');
+  new Chart(salesCtx, {
+    type: 'line',
+    data: {
+      labels: {{ sales_labels|tojson }},
+      datasets: [{
+        label: 'Sales (₹)',
+        data: {{ sales_data|tojson }},
+        borderColor: '#007bff',
+        backgroundColor: 'rgba(0,123,255,0.2)',
+        fill: true,
+        tension: 0.3
+      }]
+    }
+  });
+
+  // Category Distribution (Dummy Data, replace with backend values)
+  const categoryCtx = document.getElementById('categoryChart');
+  new Chart(categoryCtx, {
+    type: 'doughnut',
+    data: {
+      labels: {{ category_labels|tojson }},
+      datasets: [{
+        data: {{ category_data|tojson }},
+        backgroundColor: ['#ffc107','#28a745','#17a2b8','#dc3545','#6f42c1']
+      }]
+    }
+  });
+</script>
+{% endblock %}

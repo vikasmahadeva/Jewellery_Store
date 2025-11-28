@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Manage Customers{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">👥 Customer Management</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Username</th>
+      <th>Email</th>
+      <th>Is Admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for customer in customers %}
+    <tr>
+      <td>{{ customer.id }}</td>
+      <td>{{ customer.username }}</td>
+      <td>{{ customer.email }}</td>
+      <td>{{ 'Yes' if customer.is_admin else 'No' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% from "_csrf.html" import csrf_field %}
+
+{% block title %}Products (Admin){% endblock %}
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Products</h3>
+    <a class="btn btn-success" href="{{ url_for('admin.product_create') }}">+ New Product</a>
+  </div>
+
+  {% if products %}
+  <table class="table table-bordered align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th>
+        <th>Image</th>
+        <th>Name</th>
+        <th>Price</th>
+        <th>Stock</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>
+          {% if p.image %}
+            <img src="{{ p.image }}" alt="" style="width:60px;height:60px;object-fit:cover;">
+          {% endif %}
+        </td>
+        <td>{{ p.name }}</td>
+        <td>₹ {{ '%.2f'|format(p.price) }}</td>
+        <td>{{ p.stock }}</td>
+        <td>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for('admin.product_edit', pid=p.id) }}">Edit</a>
+
+          <form method="post" action="{{ url_for('admin.product_delete', pid=p.id) }}" class="d-inline" onsubmit="return confirm('Delete this product?');">
+            {{ csrf_field() }}
+            <button class="btn btn-sm btn-outline-danger">Delete</button>
+          </form>
+
+          <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('product.product_detail', product_id=p.id) }}">View</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <div class="alert alert-info">No products yet.</div>
+  {% endif %}
+</div>
+{% endblock %}

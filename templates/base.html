@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{% block title %}Jewellery Store{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 24px;
+    }
+
+    .flash { padding: 10px; margin: 10px 0; border-radius: 6px; }
+    .flash.error { background: #ffe5e5; }
+    .flash.success { background: #e6ffea; }
+    .flash.info { background: #eaf3ff; }
+
+    footer { background-color: #343a40; color: white; padding: 20px 0; text-align: center; margin-top: 40px; }
+
+    .promo-banner { background: linear-gradient(90deg, #f8b500, #ff5e57); color: white; padding: 20px; text-align: center; border-radius: 10px; margin-bottom: 20px; font-weight: bold; font-size: 1.25rem; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+    .feature-cards { display: flex; gap: 1rem; justify-content: space-around; flex-wrap: wrap; margin-bottom: 30px; }
+    .feature-card { background: #f8f9fa; border-radius: 10px; padding: 20px; width: 250px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); text-align: center; transition: transform 0.3s ease; }
+    .feature-card:hover { transform: translateY(-6px); }
+    .feature-card i { font-size: 2.5rem; color: #ffc107; margin-bottom: 10px; }
+    .feature-card h5 { font-weight: bold; margin-bottom: 10px; }
+
+    /* Navbar tweaks */
+    .navbar .form-control, .navbar .form-select { min-width: 140px; max-width: 260px; }
+    .navbar .form-control[type="text"] { width: 220px; }
+    .navbar .btn-navbar { padding: .35rem .6rem; font-size: .85rem; }
+    .navbar .nav-link { white-space: nowrap; }
+    .navbar .no-wrap { white-space: nowrap; }
+    .form-flex-nowrap { flex-wrap: nowrap; gap: 0.5rem; }
+    .badge-cart { position: relative; top: -1px; margin-left: 6px; }
+
+    @media (max-width: 991.98px) {
+      .form-flex-nowrap { flex-wrap: wrap; }
+      .navbar .form-control, .navbar .form-select { min-width: 100%; }
+    }
+  </style>
+
+  <!-- FontAwesome for icons -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{{ url_for('product.home') }}">💎 Jewellery  Store</a>
+S
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <!-- Search Form -->
+        <form method="get" action="{{ url_for('product.home') }}" class="d-flex align-items-center form-flex-nowrap me-3">
+          <input type="text" name="q" placeholder="Search products..." class="form-control" value="{{ request.args.q or '' }}">
+          <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            <option value="Gold" {% if request.args.category == 'Gold' %}selected{% endif %}>Gold</option>
+            <option value="Silver" {% if request.args.category == 'Silver' %}selected{% endif %}>Silver</option>
+            <option value="Platinum" {% if request.args.category == 'Platinum' %}selected{% endif %}>Platinum</option>
+          </select>
+          <select name="subcategory" class="form-select">
+            <option value="">All Subcategories</option>
+            <option value="Necklace" {% if request.args.subcategory == 'Necklace' %}selected{% endif %}>Necklace</option>
+            <option value="Long Haaram" {% if request.args.subcategory == 'Long Haaram' %}selected{% endif %}>Long Haaram</option>
+            <option value="Ring" {% if request.args.subcategory == 'Ring' %}selected{% endif %}>Ring</option>
+            <option value="Earrings" {% if request.args.subcategory == 'Earrings' %}selected{% endif %}>Earrings</option>
+            <option value="Bracelet" {% if request.args.subcategory == 'Bracelet' %}selected{% endif %}>Bracelet</option>
+            <option value="Other" {% if request.args.subcategory == 'Other' %}selected{% endif %}>Other</option>
+          </select>
+          <button type="submit" class="btn btn-outline-light btn-navbar">Search</button>
+        </form>
+
+        <!-- Right Links -->
+        <ul class="navbar-nav ms-auto d-flex align-items-center gap-2 no-wrap">
+          <li class="nav-item"><a class="nav-link text-light" href="{{ url_for('product.about') }}">About Us</a></li>
+          <li class="nav-item"><a class="nav-link text-light" href="{{ url_for('product.contact') }}">Contact Us</a></li>
+
+          <li class="nav-item">
+            <a class="btn btn-outline-light btn-sm no-wrap" href="{{ url_for('product.view_cart') }}">
+              🛒 Cart
+              {% if cart_count %}
+                <span class="badge bg-light text-dark badge-cart">{{ cart_count }}</span>
+              {% endif %}
+            </a>
+          </li>
+
+          {% if current_user.is_authenticated and not current_user.is_admin %}
+            <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="{{ url_for('product.profile') }}">My Profile</a></li>
+          {% endif %}
+
+          {% if current_user.is_authenticated and current_user.is_admin %}
+            <li class="nav-item"><a class="btn btn-warning btn-sm text-dark" href="{{ url_for('admin.dashboard') }}">Admin Dashboard</a></li>
+          {% endif %}
+
+          {% if current_user.is_authenticated %}
+            <li class="nav-item"><span class="navbar-text text-light">Hi, {{ current_user.username or current_user.email }}</span></li>
+            <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.logout') }}">Logout</a></li>
+          {% else %}
+            <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.login') }}">User Login</a></li>
+            <li class="nav-item"><a class="btn btn-outline-light btn-sm" href="{{ url_for('auth.signup') }}">Register</a></li>
+            <li class="nav-item"><a class="btn btn-warning btn-sm text-dark" href="{{ url_for('auth.admin_login') }}">Admin Login</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Promo Banner -->
+  <div class="container mt-4">
+    <div class="promo-banner">
+      💥 FLASH SALE: Up to 20% OFF on selected 22K Gold Necklaces! 💎 Limited stock, grab yours now! 🎉
+    </div>
+  </div>
+
+  <!-- Feature Highlights -->
+  <div class="container feature-cards">
+    <div class="feature-card">
+      <i class="fas fa-shipping-fast"></i>
+      <h5>Fast & Free Shipping</h5>
+      <p>Get your jewellery delivered quickly with no extra cost.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-gem"></i>
+      <h5>Certified Authenticity</h5>
+      <p>All products come with 100% authenticity certification.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-lock"></i>
+      <h5>Secure Payment</h5>
+      <p>Safe, encrypted transactions for a worry-free purchase.</p>
+    </div>
+    <div class="feature-card">
+      <i class="fas fa-headset"></i>
+      <h5>24/7 Customer Support</h5>
+      <p>We’re here to help you anytime via chat, call, or email.</p>
+    </div>
+  </div>
+
+  <!-- Flash Messages -->
+  <div class="container mt-3">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Page Content -->
+  <div class="container mt-4">
+    {% block content %}{% endblock %}
+  </div>
+
+  <footer>
+    &copy; {{ current_year }} 2025💎 Jewellery Store | Authentic Gold, Silver & Platinum Jewellery | Secure Online Purchase
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

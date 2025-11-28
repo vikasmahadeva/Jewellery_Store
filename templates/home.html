@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% from "_csrf.html" import csrf_field %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">All Products</h2>
+
+{% if not products %}
+  <div class="alert alert-info">No products yet.</div>
+{% else %}
+  <div class="row g-3">
+    {% for p in products %}
+      <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+        <div class="card h-100">
+          <img src="{{ p.image or url_for('static', filename='placeholder.png') }}" class="card-img-top" alt="{{ p.name }}">
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title">{{ p.name }}</h5>
+            <p class="card-text text-muted mb-1">₹ {{ '%.2f'|format(p.price) }}</p>
+            <p class="card-text flex-grow-1">{{ (p.description or '')[:90] }}{% if (p.description or '')|length > 90 %}…{% endif %}</p>
+
+
+
+            <div class="mt-auto d-flex gap-2">
+              <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('product.product_detail', product_id=p.id) }}">View</a>
+
+              <form action="{{ url_for('product.add_to_cart', product_id=p.id) }}" method="post" class="d-flex gap-2">
+                {{ csrf_field() }}
+                <input type="number" name="qty" value="1" min="1" class="form-control form-control-sm" style="width:80px">
+                <button class="btn btn-sm btn-primary">Add to cart</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}
