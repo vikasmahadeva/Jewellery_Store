@@ -226,13 +226,4 @@ Fully scalable for future enhancements like payment gateways & AI recommendation
 
 Helps convert a traditional jewellery store into a digital platform efficiently.
 
-⭐ Want a PDF or PPT version of this README?
 
-I can generate:
-
-✔️ PPT Presentation
-✔️ PDF Report
-✔️ Full Project Documentation (30+ pages)
-✔️ ER Diagram / UML / Use Cases
-
-Just say “Generate PPT” or “Generate full report”.
